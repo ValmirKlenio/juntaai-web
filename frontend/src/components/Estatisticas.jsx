@@ -41,6 +41,22 @@ function Estatisticas({ modoTEA }) {
     )
   }
 
+  // segurança: se não vier nada do back
+  if (!stats) {
+    return null
+  }
+
+  // rótulos bonitinhos para as categorias do back-end
+  const labelsCategorias = {
+    psicologica: 'Violência psicológica',
+    fisica: 'Violência física',
+    controle: 'Controle / isolamento',
+    sexual: 'Violência sexual',
+    ameaca: 'Ameaças / medo constante',
+  }
+
+  const categorias = stats.analise_categorias || {}
+
   return (
     <section className="estatisticas-section">
       <div className="container">
@@ -76,41 +92,47 @@ function Estatisticas({ modoTEA }) {
           </div>
         </div>
 
-        <div className="info-box">
-          <h3>📈 Dados Nacionais Sobre Violência</h3>
-          <ul>
-            <li>
-              <strong>1 em cada 3 mulheres</strong> no mundo já sofreu violência física ou sexual
-              por parceiro íntimo (OMS)
-            </li>
-            <li>
-              No Brasil, uma mulher é agredida a cada <strong>2 minutos</strong> (Fórum Brasileiro
-              de Segurança Pública)
-            </li>
-            <li>
-              <strong>80% dos casos</strong> de violência doméstica não são denunciados
-            </li>
-            <li>
-              A violência psicológica afeta <strong>48%</strong> das mulheres em relacionamentos
-              abusivos
-            </li>
-          </ul>
-        </div>
-
         {stats.total_respostas > 0 && (
           <div className="analise-section">
             <h3>Análise de Respostas</h3>
             <p className="info-texto">
               Os dados abaixo mostram a distribuição das respostas de forma agregada e anônima:
             </p>
+
             <div className="analise-info">
               <p>
                 Total de respostas coletadas: <strong>{stats.total_respostas}</strong>
               </p>
               <p className="texto-pequeno">
-                * Para proteger a privacidade, análises detalhadas só são exibidas quando há um
-                número significativo de respostas.
+                * Para proteger a privacidade, os dados não identificam nenhuma pessoa
+                individualmente.
               </p>
+
+              {/* GRÁFICO DE BARRAS POR CATEGORIA */}
+              {Object.keys(categorias).length > 0 && (
+                <div className="grafico-categorias">
+                  <h4>Distribuição por tipo de violência (respostas preocupantes)</h4>
+                  <div className="grafico-legenda">
+                    <span className="bolinha-legenda" /> Cada barra representa o percentual de
+                    respostas com sinais de atenção em cada categoria.
+                  </div>
+
+                  <div className="grafico-lista">
+                    {Object.entries(categorias).map(([chave, dados]) => (
+                      <div className="grafico-linha" key={chave}>
+                        <div className="grafico-label">{labelsCategorias[chave] || chave}</div>
+                        <div className="grafico-barra-wrapper">
+                          <div
+                            className="grafico-barra"
+                            style={{ width: `${dados.percentual}%` }}
+                          ></div>
+                        </div>
+                        <div className="grafico-valor">{dados.percentual}%</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
